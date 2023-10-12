@@ -55,13 +55,25 @@ class MainWindow(QMainWindow):
         return dict
 
     def start_game(self):
-        self.word = self.words.get_new_random_word()
+        self.word = self.word_saved = self.words.get_new_random_word()
         self.analysed = self.analyse_word()
         self.word = "_" * len(self.word)
+        self.drawWidget.setHangmanParts(0)
         self.update_main_label(self.word)
 
         self.keyboardWidget.new_key_typed.connect(self.new_char)
+        self.keyboardWidget.enableAll()
+
+    def lose(self):
+        self.reveal()
+        print(self.word_saved)
+        self.start_game()
+
+    def reveal(self):
+        self.update_main_label(self.word_saved)
+
     def new_char(self, key):
+        self.keyboardWidget.disableByKey(key)
         if key in self.analysed:
             for index in self.analysed[key]:
                 self.word = self.word[:index] + key + self.word[index + 1:]
@@ -69,9 +81,11 @@ class MainWindow(QMainWindow):
         else:
             self.drawWidget.setHangmanParts(self.drawWidget.hangman_parts + 1)
         if self.drawWidget.hangman_parts >= self.drawWidget.max_parts:
-            self.drawWidget.setHangmanParts(0)
+
             self.keyboardWidget.new_key_typed.disconnect()
-            self.start_game()
+            self.lose()
+
+
 
 class HangmanWidget(QWidget):
     def __init__(self):
@@ -134,6 +148,7 @@ class KeyBoard(QWidget):
             "ASDFGHJKL",
             "YXCVBNM",
         ]
+        self.buttons = {}
 
         for row in keyboard_layout:
             row_layout = QHBoxLayout()
@@ -141,6 +156,7 @@ class KeyBoard(QWidget):
                 button = QPushButton(letter)
                 button.clicked.connect(self.on_button_click)
                 row_layout.addWidget(button)
+                self.buttons[letter] = button
             self.layout.addLayout(row_layout)
 
     def on_button_click(self):
@@ -149,9 +165,22 @@ class KeyBoard(QWidget):
             letter = sender.text()
             self.new_key_typed.emit(letter.lower())
 
+    def keyPressEvent(self, event):
+        key = event.text().upper()
+        if key in self.buttons:
+            self.buttons[key].click()
+
+    def enableAll(self):
+        for button in self.buttons:
+            self.buttons[button].setEnabled(True)
+
+    def disableByKey(self, key:str):
+        self.buttons[key.upper()].setEnabled(False)
+
+
 class Words():
     def __init__(self, wordlist_path = None):
-        if wordlist_path is None: wordlist_path = "wortliste2.txt"
+        if wordlist_path is None: wordlist_path = "wortliste.txt"
         self.lines = open(wordlist_path, "r", newline="\n").readlines()
         self.wordlist = [line.strip().lower() for line in self.lines]
     def get_new_random_word(self):
