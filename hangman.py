@@ -1,7 +1,7 @@
 import random
 import sys
 from PySide6.QtWidgets import *
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Qt, Signal, QSize, QMetaObject, QCoreApplication
 from PySide6.QtGui import QPainter, QPen, QFont
 
 class MainWindow(QMainWindow):
@@ -38,7 +38,7 @@ class MainWindow(QMainWindow):
 
         self.layout.addWidget(self.upper_widget)
 
-        self.keyboardWidget = KeyBoard()
+        self.keyboardWidget = CustomKeyBoard()
         self.layout.addWidget(self.keyboardWidget)
 
         self.start_game()
@@ -121,7 +121,7 @@ class HangmanWidget(QWidget):
         self.hangman_parts = parts
         self.update()
 
-class KeyBoard(QWidget):
+class CustomKeyBoard(QWidget):
     new_key_typed = Signal(str)
     def __init__(self):
 
@@ -156,6 +156,89 @@ class Words():
         self.wordlist = [line.strip().lower() for line in self.lines]
     def get_new_random_word(self):
         return random.choice(self.wordlist)
+
+class Ui_MainWindow(object):
+    def setupUi(self, MainWindow):
+        if not MainWindow.objectName():
+            MainWindow.setObjectName(u"MainWindow")
+        MainWindow.resize(700, 450)
+        MainWindow.setMinimumSize(QSize(700, 450))
+        self.centralwidget = QWidget(MainWindow)
+        self.centralwidget.setObjectName(u"centralwidget")
+        self.verticalLayout = QVBoxLayout(self.centralwidget)
+        self.verticalLayout.setSpacing(0)
+        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
+        self.stackedWidget = QStackedWidget(self.centralwidget)
+        self.stackedWidget.setObjectName(u"stackedWidget")
+        self.page = QWidget()
+        self.page.setObjectName(u"page")
+        self.stackedWidget.addWidget(self.page)
+        self.page_2 = QWidget()
+        self.page_2.setObjectName(u"page_2")
+        self.verticalLayout_2 = QVBoxLayout(self.page_2)
+        self.verticalLayout_2.setSpacing(0)
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
+        self.widget = QWidget(self.page_2)
+        self.widget.setObjectName(u"widget")
+        self.horizontalLayout = QHBoxLayout(self.widget)
+        self.horizontalLayout.setSpacing(0)
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
+        self.widget_3 = HangmanWidget(self.widget)
+        self.widget_3.setObjectName(u"widget_3")
+
+        self.horizontalLayout.addWidget(self.widget_3)
+
+        self.label = QLabel(self.widget)
+        self.label.setObjectName(u"label")
+        self.label.setAlignment(Qt.AlignCenter)
+
+        self.horizontalLayout.addWidget(self.label)
+
+
+        self.verticalLayout_2.addWidget(self.widget)
+
+        self.widget_2 = CustomKeyBoard(self.page_2)
+        self.widget_2.setObjectName(u"widget_2")
+
+        self.verticalLayout_2.addWidget(self.widget_2)
+
+        self.stackedWidget.addWidget(self.page_2)
+        self.page_3 = QWidget()
+        self.page_3.setObjectName(u"page_3")
+        self.verticalLayout_3 = QVBoxLayout(self.page_3)
+        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
+        self.label_2 = QLabel(self.page_3)
+        self.label_2.setObjectName(u"label_2")
+
+        self.verticalLayout_3.addWidget(self.label_2, 0, Qt.AlignHCenter)
+
+        self.pushButton = QPushButton(self.page_3)
+        self.pushButton.setObjectName(u"pushButton")
+
+        self.verticalLayout_3.addWidget(self.pushButton, 0, Qt.AlignHCenter)
+
+        self.stackedWidget.addWidget(self.page_3)
+
+        self.verticalLayout.addWidget(self.stackedWidget)
+
+        MainWindow.setCentralWidget(self.centralwidget)
+
+        self.retranslateUi(MainWindow)
+
+        self.stackedWidget.setCurrentIndex(2)
+
+
+        QMetaObject.connectSlotsByName(MainWindow)
+    # setupUi
+
+    def retranslateUi(self, MainWindow):
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
+        self.label.setText("")
+        self.label_2.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
+        self.pushButton.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
