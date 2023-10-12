@@ -8,43 +8,18 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
+        self.setStyleSheet(open("style.qss").read())
+
+        self.ui.pushButton.clicked.connect(self.start_game)
+
         self.words = Words()
-
-        self.setWindowTitle("Hangman")
-        self.setFixedSize(700, 450)
-
-        self.central_widget = QWidget()
-        self.setCentralWidget(self.central_widget)
-
-        self.layout = QVBoxLayout()
-        self.central_widget.setLayout(self.layout)
-
-        self.upper_widget = QWidget()
-        self.layout2 = QHBoxLayout()
-        self.upper_widget.setLayout(self.layout2)
-
-        self.drawWidget = HangmanWidget()
-        self.layout2.addWidget(self.drawWidget)
-
-        self.label = QLabel()
-        self.label.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
-        self.label.setText("")
-        font = QFont()
-        font.setPixelSize(25)
-        font.setLetterSpacing(QFont.AbsoluteSpacing, 5)
-        self.label.setFont(font)
-        self.label.setWordWrap(True)
-        self.layout2.addWidget(self.label)
-
-        self.layout.addWidget(self.upper_widget)
-
-        self.keyboardWidget = CustomKeyBoard()
-        self.layout.addWidget(self.keyboardWidget)
 
         self.start_game()
 
     def update_main_label(self, text):
-        self.label.setText(text)
+        self.ui.label.setText(text)
 
     def analyse_word(self):
         dict = {}
@@ -55,41 +30,54 @@ class MainWindow(QMainWindow):
         return dict
 
     def start_game(self):
+        try:
+            self.ui.widget_2.new_key_typed.disconnect()
+        except RuntimeError:
+            pass
+        self.ui.stackedWidget.setCurrentIndex(1)
         self.word = self.word_saved = self.words.get_new_random_word()
         self.analysed = self.analyse_word()
         self.word = "_" * len(self.word)
-        self.drawWidget.setHangmanParts(0)
+        self.ui.widget_3.setHangmanParts(0)
         self.update_main_label(self.word)
 
-        self.keyboardWidget.new_key_typed.connect(self.new_char)
-        self.keyboardWidget.enableAll()
+        self.ui.widget_2.new_key_typed.connect(self.new_char)
+        self.ui.widget_2.enableAll()
 
     def lose(self):
-        self.reveal()
-        print(self.word_saved)
+        self.ui.stackedWidget.setCurrentIndex(2)
+        self.ui.label_2.setText(f"Das Wort war: {self.word_saved}")
+
+    def win(self):
+
+        message = QMessageBox(parent=self, text="Du hast gewonnen!!!! Suppi")
+        message.exec()
         self.start_game()
+
 
     def reveal(self):
         self.update_main_label(self.word_saved)
 
     def new_char(self, key):
-        self.keyboardWidget.disableByKey(key)
+        self.ui.widget_2.disableByKey(key)
         if key in self.analysed:
             for index in self.analysed[key]:
                 self.word = self.word[:index] + key + self.word[index + 1:]
             self.update_main_label(self.word)
+            if self.word == self.word_saved:
+                self.win()
         else:
-            self.drawWidget.setHangmanParts(self.drawWidget.hangman_parts + 1)
-        if self.drawWidget.hangman_parts >= self.drawWidget.max_parts:
+            self.ui.widget_3.setHangmanParts(self.ui.widget_3.hangman_parts + 1)
+        if self.ui.widget_3.hangman_parts >= self.ui.widget_3.max_parts:
 
-            self.keyboardWidget.new_key_typed.disconnect()
+
             self.lose()
 
 
 
 class HangmanWidget(QWidget):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent):
+        super().__init__(parent=parent)
 
         self.hangman_parts = 0
         self.max_parts = 9
@@ -99,7 +87,7 @@ class HangmanWidget(QWidget):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
 
-        pen = QPen(Qt.black, 2)
+        pen = QPen(Qt.white, 2)
         painter.setPen(pen)
 
         if self.hangman_parts >= 1:
@@ -137,9 +125,9 @@ class HangmanWidget(QWidget):
 
 class CustomKeyBoard(QWidget):
     new_key_typed = Signal(str)
-    def __init__(self):
+    def __init__(self, parent):
 
-        super().__init__()
+        super().__init__(parent=parent)
 
         self.layout = QVBoxLayout(self)
 
@@ -154,6 +142,7 @@ class CustomKeyBoard(QWidget):
             row_layout = QHBoxLayout()
             for letter in row:
                 button = QPushButton(letter)
+                button.setObjectName("keyboard-buttons")
                 button.clicked.connect(self.on_button_click)
                 row_layout.addWidget(button)
                 self.buttons[letter] = button

@@ -1,0 +1,23 @@
+QMainWindow, QMessageBox{
+    background-color: #303030
+}
+
+QLabel{
+    letter-spacing: 8px;
+    font-size: 25px;
+    color: white;
+}
+QPushButton#keyboard-buttons{
+    max-height: 40px;
+    max-width: 40px;
+    font-size: 30px;
+}
+QPushButton{
+    border: none;
+    background-color: #616161;
+    color: #EEEEEE;
+}
+
+QPushButton:disabled{
+    color: #BDBDBD
+}
