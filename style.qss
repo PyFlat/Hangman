@@ -1,9 +1,15 @@
 QMainWindow, QMessageBox{
     background-color: #303030
 }
+QMessageBox QPushButton{
+    font-size: 20px;
+    padding: 8px;
 
-QLabel{
+}
+QLabel#guessing-label{
     letter-spacing: 8px;
+}
+QLabel{
     font-size: 25px;
     color: white;
 }
@@ -16,6 +22,7 @@ QPushButton{
     border: none;
     background-color: #616161;
     color: #EEEEEE;
+    border-radius: 15px;
 }
 
 QPushButton:disabled{

@@ -14,6 +14,8 @@ class MainWindow(QMainWindow):
 
         self.ui.pushButton.clicked.connect(self.start_game)
 
+        self.ui.label.setObjectName("guessing-label")
+
         self.words = Words()
 
         self.start_game()
@@ -51,6 +53,7 @@ class MainWindow(QMainWindow):
     def win(self):
 
         message = QMessageBox(parent=self, text="Du hast gewonnen!!!! Suppi")
+        message.setWindowTitle(" ")
         message.exec()
         self.start_game()
 
