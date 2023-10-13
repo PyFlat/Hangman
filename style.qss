@@ -1,17 +1,28 @@
-QMainWindow, QMessageBox{
+*{
+	font-size: 20px;
+	font-family: Calibri;
+	color: white;
+}
+QMainWindow, QMessageBox, QWidget{
     background-color: #303030
+}
+QLineEdit{
+	qproperty-alignment: AlignCenter;
+	border-radius: 15px;
+	border: 2px solid white;
+	min-width: 200px;
+	padding: 0px 10px;
 }
 QMessageBox QPushButton{
     font-size: 20px;
     padding: 8px;
 
 }
-QLabel#guessing-label{
+QLabel#label{
     letter-spacing: 8px;
 }
 QLabel{
     font-size: 25px;
-    color: white;
 }
 QPushButton#keyboard-buttons{
     max-height: 40px;
@@ -22,7 +33,14 @@ QPushButton{
     border: none;
     background-color: #616161;
     color: #EEEEEE;
-    border-radius: 15px;
+    border-radius: 17px;
+	padding: 5 10 5 10;
+}
+QPushButton:hover:!pressed{
+	background-color: grey
+}
+QPushButton:pressed{
+	background-color: #757575
 }
 
 QPushButton:disabled{

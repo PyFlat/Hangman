@@ -12,13 +12,19 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         self.setStyleSheet(open("style.qss").read())
 
-        self.ui.pushButton.clicked.connect(self.start_game)
+        self.ui.pushButton_4.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(0))
+        self.ui.pushButton_3.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(0))
+        self.ui.pushButton_2.clicked.connect(lambda: self.start_game(None))
+        self.ui.pushButton.clicked.connect(lambda: self.start_game(None))
 
-        self.ui.label.setObjectName("guessing-label")
 
+        self.ui.start_random_btn.clicked.connect(lambda: self.start_game(None))
+        self.ui.start_custom_btn.clicked.connect(lambda: self.start_game(self.ui.custom_word_entry.text()))
+        self.ui.custom_word_entry.setMaxLength(16)
         self.words = Words()
+        self.ui.stackedWidget.setCurrentIndex(0)
 
-        self.start_game()
+
 
     def update_main_label(self, text):
         self.ui.label.setText(text)
@@ -31,13 +37,15 @@ class MainWindow(QMainWindow):
             dict[char].append(i)
         return dict
 
-    def start_game(self):
+    def start_game(self, word):
         try:
             self.ui.widget_2.new_key_typed.disconnect()
         except RuntimeError:
             pass
+        if word is not None: self.ui.custom_word_entry.clear()
         self.ui.stackedWidget.setCurrentIndex(1)
-        self.word = self.word_saved = self.words.get_new_random_word()
+        word = self.words.get_new_random_word() if word is None else word
+        self.word = self.word_saved = word
         self.analysed = self.analyse_word()
         self.word = "_" * len(self.word)
         self.ui.widget_3.setHangmanParts(0)
@@ -51,11 +59,9 @@ class MainWindow(QMainWindow):
         self.ui.label_2.setText(f"Das Wort war: {self.word_saved}")
 
     def win(self):
+        self.ui.stackedWidget.setCurrentIndex(3)
+        self.ui.label_3.setText(f"Du hast gewonnen! Das Wort war {self.word_saved}")
 
-        message = QMessageBox(parent=self, text="Du hast gewonnen!!!! Suppi")
-        message.setWindowTitle(" ")
-        message.exec()
-        self.start_game()
 
 
     def reveal(self):
@@ -194,6 +200,54 @@ class Ui_MainWindow(object):
         self.stackedWidget.setObjectName(u"stackedWidget")
         self.page = QWidget()
         self.page.setObjectName(u"page")
+        self.horizontalLayout_2 = QHBoxLayout(self.page)
+        self.horizontalLayout_2.setSpacing(0)
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
+        self.widget_4 = QWidget(self.page)
+        self.widget_4.setObjectName(u"widget_4")
+        self.verticalLayout_5 = QVBoxLayout(self.widget_4)
+        self.verticalLayout_5.setSpacing(30)
+        self.verticalLayout_5.setObjectName(u"verticalLayout_5")
+        self.verticalLayout_5.setContentsMargins(0, 0, 0, 0)
+        self.random_word_label = QLabel(self.widget_4)
+        self.random_word_label.setObjectName(u"random_word_label")
+
+        self.verticalLayout_5.addWidget(self.random_word_label, 0, Qt.AlignHCenter|Qt.AlignTop)
+
+        self.start_random_btn = QPushButton(self.widget_4)
+        self.start_random_btn.setObjectName(u"start_random_btn")
+
+        self.verticalLayout_5.addWidget(self.start_random_btn, 0, Qt.AlignHCenter|Qt.AlignVCenter)
+
+
+        self.horizontalLayout_2.addWidget(self.widget_4, 0, Qt.AlignVCenter)
+
+        self.widget_5 = QWidget(self.page)
+        self.widget_5.setObjectName(u"widget_5")
+        self.verticalLayout_6 = QVBoxLayout(self.widget_5)
+        self.verticalLayout_6.setSpacing(15)
+        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
+        self.verticalLayout_6.setContentsMargins(0, 0, 0, 0)
+        self.custom_word_label = QLabel(self.widget_5)
+        self.custom_word_label.setObjectName(u"custom_word_label")
+
+        self.verticalLayout_6.addWidget(self.custom_word_label, 0, Qt.AlignHCenter)
+
+        self.custom_word_entry = QLineEdit(self.widget_5)
+        self.custom_word_entry.setObjectName(u"custom_word_entry")
+        self.custom_word_entry.setEchoMode(QLineEdit.Password)
+
+        self.verticalLayout_6.addWidget(self.custom_word_entry, 0, Qt.AlignHCenter)
+
+        self.start_custom_btn = QPushButton(self.widget_5)
+        self.start_custom_btn.setObjectName(u"start_custom_btn")
+
+        self.verticalLayout_6.addWidget(self.start_custom_btn, 0, Qt.AlignHCenter)
+
+
+        self.horizontalLayout_2.addWidget(self.widget_5, 0, Qt.AlignVCenter)
+
         self.stackedWidget.addWidget(self.page)
         self.page_2 = QWidget()
         self.page_2.setObjectName(u"page_2")
@@ -209,12 +263,14 @@ class Ui_MainWindow(object):
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.widget_3 = HangmanWidget(self.widget)
         self.widget_3.setObjectName(u"widget_3")
+        self.widget_3.setMinimumSize(QSize(350, 225))
 
         self.horizontalLayout.addWidget(self.widget_3)
 
         self.label = QLabel(self.widget)
         self.label.setObjectName(u"label")
         self.label.setAlignment(Qt.AlignCenter)
+        self.label.setWordWrap(True)
 
         self.horizontalLayout.addWidget(self.label)
 
@@ -230,18 +286,83 @@ class Ui_MainWindow(object):
         self.page_3 = QWidget()
         self.page_3.setObjectName(u"page_3")
         self.verticalLayout_3 = QVBoxLayout(self.page_3)
+        self.verticalLayout_3.setSpacing(15)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
+        self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
+        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_3.addItem(self.verticalSpacer_2)
+
         self.label_2 = QLabel(self.page_3)
         self.label_2.setObjectName(u"label_2")
 
         self.verticalLayout_3.addWidget(self.label_2, 0, Qt.AlignHCenter)
 
-        self.pushButton = QPushButton(self.page_3)
+        self.widget_6 = QWidget(self.page_3)
+        self.widget_6.setObjectName(u"widget_6")
+        self.widget_6.setMinimumSize(QSize(0, 0))
+        self.horizontalLayout_3 = QHBoxLayout(self.widget_6)
+        self.horizontalLayout_3.setSpacing(25)
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.horizontalLayout_3.setContentsMargins(50, 0, 50, 0)
+        self.pushButton = QPushButton(self.widget_6)
         self.pushButton.setObjectName(u"pushButton")
 
-        self.verticalLayout_3.addWidget(self.pushButton, 0, Qt.AlignHCenter)
+        self.horizontalLayout_3.addWidget(self.pushButton)
+
+        self.pushButton_3 = QPushButton(self.widget_6)
+        self.pushButton_3.setObjectName(u"pushButton_3")
+
+        self.horizontalLayout_3.addWidget(self.pushButton_3)
+
+
+        self.verticalLayout_3.addWidget(self.widget_6)
+
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_3.addItem(self.verticalSpacer)
 
         self.stackedWidget.addWidget(self.page_3)
+        self.page_4 = QWidget()
+        self.page_4.setObjectName(u"page_4")
+        self.verticalLayout_4 = QVBoxLayout(self.page_4)
+        self.verticalLayout_4.setSpacing(15)
+        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
+        self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
+        self.verticalSpacer_4 = QSpacerItem(20, 166, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_4.addItem(self.verticalSpacer_4)
+
+        self.label_3 = QLabel(self.page_4)
+        self.label_3.setObjectName(u"label_3")
+
+        self.verticalLayout_4.addWidget(self.label_3, 0, Qt.AlignHCenter)
+
+        self.widget_7 = QWidget(self.page_4)
+        self.widget_7.setObjectName(u"widget_7")
+        self.widget_7.setMinimumSize(QSize(0, 0))
+        self.horizontalLayout_4 = QHBoxLayout(self.widget_7)
+        self.horizontalLayout_4.setSpacing(25)
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.horizontalLayout_4.setContentsMargins(50, 0, 50, 0)
+        self.pushButton_2 = QPushButton(self.widget_7)
+        self.pushButton_2.setObjectName(u"pushButton_2")
+
+        self.horizontalLayout_4.addWidget(self.pushButton_2)
+
+        self.pushButton_4 = QPushButton(self.widget_7)
+        self.pushButton_4.setObjectName(u"pushButton_4")
+
+        self.horizontalLayout_4.addWidget(self.pushButton_4)
+
+
+        self.verticalLayout_4.addWidget(self.widget_7)
+
+        self.verticalSpacer_3 = QSpacerItem(20, 168, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_4.addItem(self.verticalSpacer_3)
+
+        self.stackedWidget.addWidget(self.page_4)
 
         self.verticalLayout.addWidget(self.stackedWidget)
 
@@ -257,9 +378,17 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
+        self.random_word_label.setText(QCoreApplication.translate("MainWindow", u"Zuf\u00e4lliges Wort", None))
+        self.start_random_btn.setText(QCoreApplication.translate("MainWindow", u"Spiel starten", None))
+        self.custom_word_label.setText(QCoreApplication.translate("MainWindow", u"Wort eingeben", None))
+        self.start_custom_btn.setText(QCoreApplication.translate("MainWindow", u"Spiel starten", None))
         self.label.setText("")
-        self.label_2.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
-        self.pushButton.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
+        self.label_2.setText("")
+        self.pushButton.setText(QCoreApplication.translate("MainWindow", u"Neustart mit neuem Wort", None))
+        self.pushButton_3.setText(QCoreApplication.translate("MainWindow", u"Startseite", None))
+        self.label_3.setText("")
+        self.pushButton_2.setText(QCoreApplication.translate("MainWindow", u"Neustart mit neuem Wort", None))
+        self.pushButton_4.setText(QCoreApplication.translate("MainWindow", u"Startseite", None))
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
