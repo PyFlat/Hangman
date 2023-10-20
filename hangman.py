@@ -45,7 +45,7 @@ class MainWindow(QMainWindow):
         if word is not None: self.ui.custom_word_entry.clear()
         self.ui.stackedWidget.setCurrentIndex(1)
         word = self.words.get_new_random_word() if word is None else word
-        self.word = self.word_saved = word
+        self.word = self.word_saved = word.lower()
         self.analysed = self.analyse_word()
         self.word = "_" * len(self.word)
         self.ui.widget_3.setHangmanParts(0)
