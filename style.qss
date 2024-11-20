@@ -44,5 +44,6 @@ QPushButton:pressed{
 }
 
 QPushButton:disabled{
-    color: #BDBDBD
+    color: transparent;
+    background-color: transparent;
 }
